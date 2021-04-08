@@ -1,0 +1,72 @@
+---
+title: "crime-vancouver"
+author: "Ashley Choo"
+date: "28/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Interactive visualization of crime in Vancouver
+
+
+This is an interactive visualization of the rate of crime (mischief) in each neighborhood in Vancouver. This map can be used to easily see which neighborhood has the highest rate of crime and therefore should take caution in those areas.
+
+```{r,echo=FALSE, results='hide',warning=FALSE}
+library(data.table)
+library(sp)
+library(rgdal)
+library(dplyr)
+library(ggpubr)
+library(grid)
+library(leaflet)
+library(readr)
+library(tidyverse)
+library(repr)
+library(tidymodels)
+
+
+```
+
+```{r 1, echo=FALSE, message = FALSE, results='hide'}
+crime_data = read_csv("crime.csv") %>%
+  filter(YEAR == "2017", TYPE == "Mischief")
+crime_data
+```
+
+```{r, message = FALSE, results='hide'}
+crime_data = as.data.table(crime_data)
+```
+
+```{r, message = FALSE, results='hide'}
+crime_tab = crime_data[NEIGHBOURHOOD!=""]
+```
+
+```{r, message = FALSE, results='hide'}
+coordinates(crime_tab) = c("Longitude","Latitude")
+crs.geo1 = CRS("+proj=longlat")
+proj4string(crime_tab) = crs.geo1
+```
+
+```{r, message = FALSE, results='hide'}
+plot(crime_tab, pch = 20, col = alpha("#F9B7DA",0.50))
+```
+
+```{r, message = FALSE, results='hide'}
+vancity = readOGR(dsn = "./data", layer = "local-area-boundary")
+```
+```{r, message = FALSE, results='hide', warning=FALSE}
+proj4string(vancity) = crs.geo1
+```
+
+```{r, message = FALSE}
+crime_agg = aggregate(x=crime_tab["TYPE"],by=vancity,FUN=length)
+
+qpal = colorBin("Reds", crime_agg$TYPE, bins=10)
+leaflet(crime_agg) %>%
+  addPolygons(stroke=TRUE,opacity = 1, fillOpacity = 0.5, smoothFactor = 0.5,color="black",fillColor = ~qpal(TYPE),weight = 1) %>%
+  addLegend(values=~TYPE, pal=qpal,title="Number Of Crimes Committed")
+
+```

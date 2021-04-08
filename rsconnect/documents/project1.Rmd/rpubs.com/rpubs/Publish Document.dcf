@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/735225/4cb6f5162c694f69ac4a067641c6b6b1
+bundleId: https://api.rpubs.com/api/v1/document/735225/4cb6f5162c694f69ac4a067641c6b6b1
+url: http://rpubs.com/pockeysticks/735225
+when: 1615110092.24791
